@@ -1,4 +1,4 @@
-module wyze
+module github.com/stevejones-softwaredev/wyze-api
 
 go 1.18
 
