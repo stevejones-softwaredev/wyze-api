@@ -1,4 +1,4 @@
-module sjones/wyze-go/wyze
+module wyze
 
 go 1.18
 
