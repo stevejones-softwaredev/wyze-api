@@ -18,6 +18,15 @@ const wyzeLightPropPowerKey string = "P3"
 const wyzeLightPropBrightnessKey string = "P1501"
 const wyzeLightPropColorKey string = "P1507"
 
+func getFilterNameToValueMap() map[string]int {
+  return map[string]int {
+    "Person": 101,
+    "Pet": 102,
+    "Vehicle": 103,
+    "Package" :104,
+  };
+}
+
 func getPropertyCodesToNamesMap() map[string]string {
   return map[string]string {
     "P1501": "brightness",
