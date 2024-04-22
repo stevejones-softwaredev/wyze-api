@@ -23,7 +23,7 @@ func getFilterNameToValueMap() map[string]int {
     "Person": 101,
     "Pet": 102,
     "Vehicle": 103,
-    "Package" :104,
+    "Package" :104, 
   };
 }
 
