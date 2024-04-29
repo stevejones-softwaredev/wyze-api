@@ -104,7 +104,7 @@ func GetWyzeCamThumbnails(client *resty.Client,
     tags []int,
     begin_time time.Time,
     end_time time.Time) []WyzeDownloadedFile {
-  var thumbnailPaths []WyzeDownloadedFile
+  thumbnailPaths := make([]WyzeDownloadedFile, 0)
   var eventResponse WyzeEventResponse
 
   payload := WyzeEventRequest{
@@ -199,7 +199,7 @@ func GetWyzeDeviceList(client *resty.Client,
 func GetWyzeBulbList(client *resty.Client,
     accessToken string) []WyzeDevice {
   devices := GetWyzeDeviceList(client, accessToken)
-  var bulbs []WyzeDevice
+  bulbs := make([]WyzeDevice, 0)
 
   for _,device := range devices {
      if (device.ProductType == "MeshLight") {
@@ -234,7 +234,7 @@ func GetWyzeGroupList(client *resty.Client,
   deviceListResponse.Data.DeviceList = IntegrateDeviceProperties(client, accessToken, deviceListResponse.Data.DeviceList)
 
   devicesMap := make(map[string]WyzeDevice)
-  var deviceMacs []string
+  deviceMacs := make([]string, 0)
 
   for _,device := range deviceListResponse.Data.DeviceList {
     devicesMap[device.MAC] = device
@@ -242,11 +242,11 @@ func GetWyzeGroupList(client *resty.Client,
     deviceMacs = append(deviceMacs, device.MAC)
   }
 
-  var newGroups []WyzeDeviceGroup
+  newGroups := make([]WyzeDeviceGroup, 0)
   
   for _,group := range deviceListResponse.Data.GroupList {
     group.PoweredOn = false
-    var newDeviceList []WyzeDevice
+    newDeviceList := make([]WyzeDevice, 0)
   
     for _,device := range group.DeviceList {
       propDevice := devicesMap[device.DeviceMac]
@@ -317,7 +317,7 @@ func SetWyzeProperties(client *resty.Client,
     devices map[string]string,
     properties map[string]string) {
 
-  var propList []WyzeActionProperty
+  propList := make([]WyzeActionProperty, 0)
 
   namesToCodes := getPropertyNamesToCodesMap()
   
@@ -339,10 +339,10 @@ func SetWyzeProperties(client *resty.Client,
     propList = append(propList, prop)
   }
   
-  var actionList []WyzeActionList
+  actionList := make([]WyzeActionList, 0)
   
   for device,model := range devices {
-    var paramEntries []WyzeActionParamEntry
+    paramEntries := make([]WyzeActionParamEntry, 0)
     paramEntry := WyzeActionParamEntry{
       MAC: device,
       PList: propList,
@@ -411,7 +411,7 @@ func GetWyzeDeviceProperties(client *resty.Client,
     log.Println(err)
   }
   
-  var newDeviceList []WyzeDeviceProperties
+  newDeviceList := make([]WyzeDeviceProperties, 0)
 
   codeToName := getPropertyCodesToNamesMap()
   
@@ -436,8 +436,8 @@ func GetWyzeDeviceProperties(client *resty.Client,
 
 func IntegrateDeviceProperties(client *resty.Client,
     accessToken string, devices []WyzeDevice) []WyzeDevice {
-  var deviceMacs []string
-  var propDevices []WyzeDevice
+  deviceMacs := make([]string, 0)
+  propDevices := make([]WyzeDevice, 0)
 
   for _,device := range devices {
     deviceMacs = append(deviceMacs, device.MAC)
