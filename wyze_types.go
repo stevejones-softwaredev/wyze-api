@@ -7,6 +7,7 @@ type WyzeRefreshTokenRequest struct {
 
 type WyzeRefreshTokenResponse struct {
   RefreshToken string     `json:"refresh_token"`
+  AccessToken string      `json:"access_token"`
 }
 
 type WyzeAccessTokenRequest struct {
