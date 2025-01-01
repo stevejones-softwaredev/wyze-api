@@ -13,12 +13,12 @@ import (
   "os"
 )
 
-func isRefreshTokenValid(refreshToken string) bool {
-  if (len(refreshToken) == 0) {
+func isTokenValid(tokenString string) bool {
+  if (len(tokenString) == 0) {
     return false
   }
 
-  token, _, tokenErr := new(jwt.Parser).ParseUnverified(refreshToken, jwt.MapClaims{})
+  token, _, tokenErr := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
 
   if (tokenErr != nil) {
     fmt.Println("Token Error: ", tokenErr)
@@ -35,7 +35,7 @@ func isRefreshTokenValid(refreshToken string) bool {
   return (time.Now().Before(expiration.Time))
 }
 
-func GetWyzeRefreshToken(client *resty.Client, username string, password string, keyId string, apiKey string) string {
+func GetWyzeRefreshToken(client *resty.Client, username string, password string, keyId string, apiKey string) (string, string) {
   var refreshTokenResponse WyzeRefreshTokenResponse
   
   payload := WyzeRefreshTokenRequest{
@@ -56,21 +56,23 @@ func GetWyzeRefreshToken(client *resty.Client, username string, password string,
     fmt.Println(err)
     return ""
   } else {
-    return refreshTokenResponse.RefreshToken
+    return refreshTokenResponse.RefreshToken, refreshTokenResponse.AccessToken
   }
 }
 
 
 func GetWyzeAccessToken(client *resty.Client, env map[string]string) string {
-  filePath := env["WYZE_HOME"] + "refresh_token.txt"
-  refreshToken := readRefreshToken(filePath)
-  if (!isRefreshTokenValid(refreshToken)) {
+  refreshFilePath := env["WYZE_HOME"] + "refresh_token.txt"
+  accessFilePath := env["WYZE_HOME"] + "access_token.txt"
+  refreshToken := readToken(refreshFilePath)
+  accessToken := readToken(accessFilePath)
+  if (!isTokenValid(accessToken)) {
     fmt.Println("Create new refresh token")
-    refreshToken = GetWyzeRefreshToken(client, env["WYZE_USERNAME"], env["WYZE_PASSWORD_HASH"], env["WYZE_KEY_ID"], env["WYZE_API_KEY"])
-    writeRefreshToken(refreshToken, filePath)
+    refreshToken, accessToken = GetWyzeRefreshToken(client, env["WYZE_USERNAME"], env["WYZE_PASSWORD_HASH"], env["WYZE_KEY_ID"], env["WYZE_API_KEY"])
+    writeToken(accessToken, accessFilePath)
   }
 
-  var accessTokenResponse WyzeAccessTokenResponse
+/*  var accessTokenResponse WyzeAccessTokenResponse
 
   payload := WyzeAccessTokenRequest{
     AppVer: wyzeDeveloperApi,
@@ -94,6 +96,8 @@ func GetWyzeAccessToken(client *resty.Client, env map[string]string) string {
     } else {
       return accessTokenResponse.Data.AccessToken
     }
+    */
+  return accessToken
 }
 
 func GetWyzeCamThumbnails(client *resty.Client,
@@ -459,7 +463,7 @@ func IntegrateDeviceProperties(client *resty.Client,
   return propDevices;
 }
 
-func readRefreshToken(filePath string) string {
+func readToken(filePath string) string {
   data, err := os.ReadFile(filePath)
   if err != nil {
     log.Println(err)
@@ -469,7 +473,7 @@ func readRefreshToken(filePath string) string {
   return string(data[:])
 }
 
-func writeRefreshToken(refreshToken string, filePath string) {
+func writeToken(token string, filePath string) {
   f, err := os.Create(filePath)
   if err != nil {
     log.Println(err)
@@ -478,7 +482,7 @@ func writeRefreshToken(refreshToken string, filePath string) {
 
   defer f.Close()
 
-  fmt.Fprintf(f, "%s", refreshToken)
+  fmt.Fprintf(f, "%s", token)
 }
 
 
